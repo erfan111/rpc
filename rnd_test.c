@@ -61,8 +61,8 @@ int main(){
     srand(time(NULL));
     int i;
     float a;
-    for(i=0;i<40;i++){
-        a = bimodal(0,1,0.5, 1, 2, 1.5);
+    for(i=0;i<400;i++){
+        a = rand_normal(1,1);
         printf("a = %f\n", a);
     }
     return 0;

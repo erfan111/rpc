@@ -117,7 +117,7 @@ void *connection_handler(void *param)
 	//	client_message[read_size] = '\0';
 	struct timeval my_time;
 	char iust[5] = "IUST:";
-    now = (bimodal(tp->bmd[0],tp->bmd[1],tp->bmd[2],tp->bmd[3],tp->bmd[4],tp->bmd[5]) * 1000000);
+    now = (bimodal(tp->bmd[0],tp->bmd[1],tp->bmd[2],tp->bmd[3],tp->bmd[4],tp->bmd[5]));
     usleep(now);
 	if(memcmp(client_message, iust, 5) == 0){
     	memcpy(&my_time, &client_message[5], sizeof(my_time));
