@@ -62,11 +62,7 @@ int main(int argc , char *argv[])
     //Listen
     listen(socket_desc , 1000);
 
-    //Accept and incoming connection
-    puts("Waiting for incoming connections...");
-    c = sizeof(struct sockaddr_in);
-
-
+    
     //Accept and incoming connection
     puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
@@ -119,10 +115,13 @@ void *connection_handler(void *param)
 	//	client_message[read_size] = '\0';
 	struct timeval my_time;
 	char iust[5] = "IUST:";
-    now = (nextTime(mean, stddev) * 1000000);
-    usleep(now);
+    	do {now = nextTime(mean, stddev);}
+	while (now < 0);
+	//printf("it will take %f us\n", now);
+    	usleep(now);
 	if(memcmp(client_message, iust, 5) == 0){
-    	memcpy(&my_time, &client_message[5], sizeof(my_time));
+    	    memcpy(&my_time, &client_message[5], sizeof(my_time));
+           // printf("%s time %ld\n", client_message, my_time.tv_sec * 1000000 + my_time.tv_usec);
     		//Send the message back to client
             write(sock , client_message , 37);
 
