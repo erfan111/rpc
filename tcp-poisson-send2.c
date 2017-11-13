@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
+#include <netinet/tcp.h>
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
@@ -81,12 +81,13 @@ void sigintHandler(int signal)
 void *listen_handler(void *args){
     int* destSocket = (int *)args;
     int n;
-    char timestamp[37];
+    long int diff;
+    char timestamp[2450];
     double d2;
     struct timeval afterSleep, rec_time, send_time;
     char iust[5] = "IUST:";
     while(1){
-        n = recv(*destSocket, timestamp, 37, 0 );
+        n = recv(*destSocket, timestamp, 2450, 0 );
         if( n > 1){
           gettimeofday(&afterSleep, 0);
           d2 = afterSleep.tv_sec*1000000.0 +  afterSleep.tv_usec;
@@ -95,10 +96,13 @@ void *listen_handler(void *args){
           if(memcmp(timestamp, iust, 5) == 0){
               memcpy(&rec_time, &timestamp[5], sizeof(rec_time));
               memcpy(&send_time, &timestamp[21], sizeof(send_time));
+	      //diff = (send_time.tv_sec - rec_time.tv_sec) * 1000000 + (send_time.tv_usec - rec_time.tv_usec);
+              diff = (send_time.tv_usec - rec_time.tv_usec);
+
               //fprintf(stderr, "%ld\t %ld\n", (long int) (d2-d1) , (send_time.tv_sec - rec_time.tv_sec) * 1000000 + (send_time.tv_usec - rec_time.tv_usec));
-              fprintf(stderr, "%ld\t %ld\n", 0 , (send_time.tv_sec - rec_time.tv_sec) * 1000000 + (send_time.tv_usec - rec_time.tv_usec));
+              fprintf(stderr, "%ld\t %ld\n", 0 , diff);
               //clear the message buffer
-              memset(timestamp, 0, 37);
+              memset(timestamp, 0, 2450);
           }
         }
     }
@@ -164,7 +168,8 @@ int main(int argc, char **argv)
     signal(SIGINT, sigintHandler);
 
     /* Data packet to send. */
-    char dataPacket[37] = "IUST:00000000000000000000000000000000";
+    char dataPacket[2450] = "IUST:00000000000000000000000000000000";
+    //memset(dataPacket[37], '0', 2413);
 
     /* Initialize the random number generator. */
     srand(clock());
@@ -181,6 +186,8 @@ int main(int argc, char **argv)
     destSocketAddr.sin_family   = AF_INET;
     destSocketAddr.sin_addr     = destAddr;
     destSocketAddr.sin_port     = htons(destPort);
+    int i = 1;
+    setsockopt( destSocket, IPPROTO_TCP, TCP_NODELAY, (void *)&i, sizeof(i));
 
     struct timeval afterSleep;
     float now;

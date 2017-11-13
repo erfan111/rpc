@@ -2,7 +2,7 @@
 for i in `seq 1 $1`;
 do
 #./tcp-poisson-send.out -d 10.254.254.3 -p 8888 -r $2 &
-./tcp-poisson-send.out -d 10.254.254.3 -p 8888 -r $2 &> "c0lient$i.txt" &
+./tcp-poisson-send2.out -d 10.254.254.3 -p 8888 -r $2 &> "c0lient$i.txt" &
 
 #./poisson-send.out -d 10.254.254.1 -p 3000 -r $2 > "c1lient$i.txt" &
 #./poisson-send.out -d 10.254.254.1 -p 3000 -r $2 > "c2lient$i.txt" &
