@@ -70,7 +70,7 @@ int main(int argc , char *argv[])
     while( (client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
         struct thread_param tp;
-        puts("Connection accepted");
+        //puts("Connection accepted");
         tp.socket_desc = client_sock;
         tp.mean = mean;
         tp.stddev = stddev;
@@ -82,7 +82,7 @@ int main(int argc , char *argv[])
 
         //Now join the thread , so that we dont terminate before the thread
         //pthread_join( thread_id , NULL);
-        puts("Handler assigned");
+        //puts("Handler assigned");
     }
 
     if (client_sock < 0)

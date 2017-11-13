@@ -1,7 +1,9 @@
 #!/bin/bash
 for i in `seq 1 $1`;
 do
-./tcp-poisson-send.out -d $3 -p 8888 -r $2 &
+#./tcp-poisson-send.out -d $3 -p 8888 -r $2 &
+./tcp-poisson-send.out -d $3 -p 9001 -r $2 &
+
 #./poisson-send.out -d 10.254.254.1 -p 3000 -r $2 > "c1lient$i.txt" &
 #./poisson-send.out -d 10.254.254.1 -p 3000 -r $2 > "c2lient$i.txt" &
 #./poisson-send.out -d 10.254.254.1 -p 3000 -r $2 > "c3lient$i.txt" &
