@@ -82,12 +82,12 @@ void *listen_handler(void *args){
     int* destSocket = (int *)args;
     int n;
     long int diff;
-    char timestamp[2450];
+    char timestamp[150];
     double d2;
     struct timeval afterSleep, rec_time, send_time;
     char iust[5] = "IUST:";
     while(1){
-        n = recv(*destSocket, timestamp, 2450, 0 );
+        n = recv(*destSocket, timestamp, 150, 0 );
         if( n > 1){
           gettimeofday(&afterSleep, 0);
           d2 = afterSleep.tv_sec*1000000.0 +  afterSleep.tv_usec;
@@ -102,7 +102,7 @@ void *listen_handler(void *args){
               //fprintf(stderr, "%ld\t %ld\n", (long int) (d2-d1) , (send_time.tv_sec - rec_time.tv_sec) * 1000000 + (send_time.tv_usec - rec_time.tv_usec));
               fprintf(stderr, "%ld\t %ld\n", 0 , diff);
               //clear the message buffer
-              memset(timestamp, 0, 2450);
+              memset(timestamp, 0, 150);
           }
         }
     }
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
     signal(SIGINT, sigintHandler);
 
     /* Data packet to send. */
-    char dataPacket[2450] = "IUST:00000000000000000000000000000000";
+    char dataPacket[150] = "IUST:00000000000000000000000000000000";
     //memset(dataPacket[37], '0', 2413);
 
     /* Initialize the random number generator. */
