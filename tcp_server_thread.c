@@ -11,13 +11,14 @@
 #include<arpa/inet.h> //inet_addr
 #include<unistd.h>    //write
 #include<pthread.h> //for threading , link with lpthread
+#include <netinet/tcp.h>
  
 //the thread function
 void *connection_handler(void *);
  
 int main(int argc , char *argv[])
 {
-    int socket_desc , client_sock , c;
+    int socket_desc , client_sock , c, i=1;
     struct sockaddr_in server , client;
      
     //Create socket
@@ -32,7 +33,7 @@ int main(int argc , char *argv[])
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = htons( 8888 );
-     
+    setsockopt( socket_desc, IPPROTO_TCP, TCP_NODELAY, (void *)&i, sizeof(i)); 
     //Bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
     {
@@ -43,12 +44,7 @@ int main(int argc , char *argv[])
     puts("bind done");
      
     //Listen
-    listen(socket_desc , 1000);
-     
-    //Accept and incoming connection
-    puts("Waiting for incoming connections...");
-    c = sizeof(struct sockaddr_in);
-     
+    listen(socket_desc , 1500);
      
     //Accept and incoming connection
     puts("Waiting for incoming connections...");
@@ -87,7 +83,7 @@ void *connection_handler(void *socket_desc)
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int read_size;
-    char *message , client_message[2000];
+    char *message , client_message[150];
      
     //Send some messages to the client
     //message = "Greetings! I am your connection handler\n";
@@ -97,7 +93,7 @@ void *connection_handler(void *socket_desc)
     //write(sock , message , strlen(message));
      
     //Receive a message from client
-    while( (read_size = recv(sock , client_message , 37 , 0)) > 0 )
+    while( (read_size = recv(sock , client_message , 150 , 0)) > 0 )
     {
         //end of string marker
 	//	client_message[read_size] = '\0';
@@ -107,10 +103,10 @@ void *connection_handler(void *socket_desc)
 	memcpy(&my_time, &client_message[5], sizeof(my_time));
 //	printf("%s time %ld\n", client_message, my_time.tv_sec * 1000000 + my_time.tv_usec);
 		//Send the message back to client
-        write(sock , client_message , 37);
+        write(sock , client_message , 150);
 		
 		//clear the message buffer
-		memset(client_message, 0, 37);
+		memset(client_message, 0, 150);
 	}
     }
      
