@@ -81,26 +81,25 @@ void sigintHandler(int signal)
 void *listen_handler(void *args){
     int* destSocket = (int *)args;
     int n;
-    long int diff;
+    long int diff, temp;
     char timestamp[150];
-    double d2;
-    struct timeval afterSleep, rec_time, send_time;
+    struct timeval beforeSleep, afterSleep, rec_time, send_time;
+    double d1,d2, d3;
     char iust[5] = "IUST:";
     while(1){
         n = recv(*destSocket, timestamp, 150, 0 );
         if( n > 1){
           gettimeofday(&afterSleep, 0);
-          d2 = afterSleep.tv_sec*1000000.0 +  afterSleep.tv_usec;
           //printf("after: %.10f \n", d2);
           //printf("erfan\t %d\n", (int) (d2 - d1) );
           if(memcmp(timestamp, iust, 5) == 0){
               memcpy(&rec_time, &timestamp[5], sizeof(rec_time));
               memcpy(&send_time, &timestamp[21], sizeof(send_time));
-	      //diff = (send_time.tv_sec - rec_time.tv_sec) * 1000000 + (send_time.tv_usec - rec_time.tv_usec);
-              diff = (send_time.tv_usec - rec_time.tv_usec);
-
-              //fprintf(stderr, "%ld\t %ld\n", (long int) (d2-d1) , (send_time.tv_sec - rec_time.tv_sec) * 1000000 + (send_time.tv_usec - rec_time.tv_usec));
-              fprintf(stderr, "%ld\t %ld\n", 0 , diff);
+	          d2 = atof(timestamp+37);
+	          diff = ((send_time.tv_sec - rec_time.tv_sec)*1000000.0 + send_time.tv_usec - rec_time.tv_usec);
+	          d1 = afterSleep.tv_sec* 1000000.0 + afterSleep.tv_usec;
+              d3 = d1 - d2;
+              fprintf(stderr, "%f\t %ld\n", d3, diff);
               //clear the message buffer
               memset(timestamp, 0, 150);
           }
@@ -168,7 +167,7 @@ int main(int argc, char **argv)
     signal(SIGINT, sigintHandler);
 
     /* Data packet to send. */
-    char dataPacket[150] = "IUST:00000000000000000000000000000000";
+    char dataPacket[150] = "IUST:000000000000000000000000000000000000000000000000";
     //memset(dataPacket[37], '0', 2413);
 
     /* Initialize the random number generator. */
@@ -188,7 +187,7 @@ int main(int argc, char **argv)
     destSocketAddr.sin_port     = htons(destPort);
     int i = 1;
     setsockopt( destSocket, IPPROTO_TCP, TCP_NODELAY, (void *)&i, sizeof(i));
-
+    char arr[sizeof(double)];
     struct timeval afterSleep;
     float now;
     double d1;
@@ -206,7 +205,9 @@ int main(int argc, char **argv)
       usleep(now);
       gettimeofday(&afterSleep, 0);
       d1 = afterSleep.tv_sec*1000000.0 +  afterSleep.tv_usec;
-      //printf("before: %.10f \n", d1);
+      sprintf(arr,"%f", d1);
+      strcpy(dataPacket + 37, arr);
+      //memcpy(&dataPacket + 37, &afterSleep, sizeof(afterSleep));
       if (0 > sendto(destSocket,
                      &dataPacket,
                      sizeof(dataPacket),
