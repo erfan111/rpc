@@ -97,17 +97,17 @@ void *connection_handler(void *socket_desc)
     {
         //end of string marker
 	//	client_message[read_size] = '\0';
-	struct timeval my_time;
-	char iust[5] = "IUST:";
-	if(memcmp(client_message, iust, 5) == 0){
-	memcpy(&my_time, &client_message[5], sizeof(my_time));
-//	printf("%s time %ld\n", client_message, my_time.tv_sec * 1000000 + my_time.tv_usec);
+	//struct timeval my_time;
+	//char iust[5] = "IUST:";
+	//if(memcmp(client_message, iust, 5) == 0){
+	//memcpy(&my_time, &client_message[5], sizeof(my_time));
+//	printf("%s\n", client_message);
 		//Send the message back to client
         write(sock , client_message , 150);
 		
 		//clear the message buffer
 		memset(client_message, 0, 150);
-	}
+	//}
     }
      
     if(read_size == 0)
