@@ -14,21 +14,23 @@
 #include <math.h>
 #include <sys/time.h>
 #include <time.h>
+#include <random>
 
 struct thread_param {
     int socket_desc;
-    int mean;
-    int stddev;
+    int k;
+    int theta;
 };
 
-float nextTime(float mean, float stddev);
+std::default_random_engine generator;
+
 
 //the thread function
 void *connection_handler(void *);
 
 int main(int argc , char *argv[])
 {
-    int socket_desc , client_sock , c, mean = 1, stddev = 1;
+    int socket_desc , client_sock , c, k = 1, theta = 1;
     struct sockaddr_in server , client;
     srand(time(NULL));
     //Create socket
@@ -37,13 +39,13 @@ int main(int argc , char *argv[])
     {
         printf("Could not create socket");
     }
-    puts("Socket created");
+    puts("Gamma Socket created");
     if(argc == 3){
-        mean = atoi(argv[1]);
-        stddev = atoi(argv[2]);
+        k = atoi(argv[1]);
+        theta = atoi(argv[2]);
     }
     else{
-        fprintf(stderr, "provide mean and stddev \n");
+        fprintf(stderr, "provide k and theta \n");
         exit(1);
     }
 
@@ -74,8 +76,8 @@ int main(int argc , char *argv[])
         struct thread_param tp;
         //puts("Connection accepted");
         tp.socket_desc = client_sock;
-        tp.mean = mean;
-        tp.stddev = stddev;
+        tp.k = k;
+        tp.theta = theta;
         if( pthread_create( &thread_id , NULL ,  connection_handler , (void*) &tp) < 0)
         {
             perror("could not create thread");
@@ -104,20 +106,20 @@ void *connection_handler(void *param)
     //Get the socket descriptor
     struct thread_param *tp = (struct thread_param*) param;
     int sock = tp->socket_desc;
-    int mean = tp->mean;
-    int stddev = tp->stddev;
+    int k = tp->k;
+    int theta = tp->theta;
     int read_size;
     char client_message[150];
-    float now;
-	long int difference;
-
+    double now;
+	double difference;
+    std::gamma_distribution<double> distribution(k, theta);
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 37 , 0)) > 0 )
     {
         //end of string marker
 	//	client_message[read_size] = '\0';
 	struct timeval my_time, moment;
-	do {now = nextTime(mean, stddev);}
+	do {now = distribution(generator);}
     while (now < 0);
 	printf("now = %f\n");
 	gettimeofday(&my_time, 0);
