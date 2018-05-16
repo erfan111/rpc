@@ -11,7 +11,7 @@
 #include <ctype.h>
 
 
-#define MAXBUF 1000
+#define MAXBUF 150
 #define MAXEVENTS 5
 #define PORTNUM 8888
 
