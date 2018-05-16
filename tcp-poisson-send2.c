@@ -92,17 +92,17 @@ void *listen_handler(void *args){
           gettimeofday(&afterSleep, 0);
           //printf("after: %.10f \n", d2);
           //printf("erfan\t %d\n", (int) (d2 - d1) );
-          if(memcmp(timestamp, iust, 5) == 0){
+          //if(memcmp(timestamp, iust, 5) == 0){
               memcpy(&rec_time, &timestamp[5], sizeof(rec_time));
               memcpy(&send_time, &timestamp[21], sizeof(send_time));
-	          d2 = atof(timestamp+37);
-	          diff = ((send_time.tv_sec - rec_time.tv_sec)*1000000.0 + send_time.tv_usec - rec_time.tv_usec);
-	          d1 = afterSleep.tv_sec* 1000000.0 + afterSleep.tv_usec;
+	      d2 = atof(timestamp+37);
+	      diff = ((send_time.tv_sec - rec_time.tv_sec)*1000000.0 + send_time.tv_usec - rec_time.tv_usec);
+	      d1 = afterSleep.tv_sec* 1000000.0 + afterSleep.tv_usec;
               d3 = d1 - d2;
               fprintf(stderr, "%f\t %ld\n", d3, diff);
               //clear the message buffer
               memset(timestamp, 0, 150);
-          }
+          //}
         }
     }
     return 0;
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
     destSocketAddr.sin_port     = htons(destPort);
     int i = 1;
     setsockopt( destSocket, IPPROTO_TCP, TCP_NODELAY, (void *)&i, sizeof(i));
-    char arr[sizeof(double)];
+    char arr[24];
     struct timeval afterSleep;
     float now;
     double d1;
@@ -206,8 +206,10 @@ int main(int argc, char **argv)
       gettimeofday(&afterSleep, 0);
       d1 = afterSleep.tv_sec*1000000.0 +  afterSleep.tv_usec;
       sprintf(arr,"%f", d1);
+      //printf("arr %s, %d, %d\n", arr, sizeof(arr), sizeof(double));
       strcpy(dataPacket + 37, arr);
       //memcpy(&dataPacket + 37, &afterSleep, sizeof(afterSleep));
+      //printf("packet: %s\n", dataPacket);
       if (0 > sendto(destSocket,
                      &dataPacket,
                      sizeof(dataPacket),
